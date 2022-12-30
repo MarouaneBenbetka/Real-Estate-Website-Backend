@@ -1,1 +1,2 @@
-from api.routes.user_routes import user_bp
+from api.routes.api_routes import user_bp
+import api.routes.admin_routes

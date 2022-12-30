@@ -8,3 +8,6 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     phone_number = db.Column(db.String(10), nullable=False)
     annonces = db.relationship("Annonce", backref="owner", lazy=False)
+    def add(self):
+        db.session.add(self)
+        db.session.commit()

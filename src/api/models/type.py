@@ -1,4 +1,4 @@
-from api import db
+from src.api import db
 class Type(db.Model):
     __tablename__ = "types"
     id = db.Column(db.Integer, primary_key=True, nullable=True, unique=True)

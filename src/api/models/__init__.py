@@ -1,5 +1,6 @@
 
-from api.models.user import User
-from api.models.annonce import Annonce
-from api.models.type import Type
-from api.models.image import Image
+from src.api.models.user import User
+from src.api.models.annonce import Annonce
+from src.api.models.type import Type
+from src.api.models.image import Image
+from src.api.models.message import Message

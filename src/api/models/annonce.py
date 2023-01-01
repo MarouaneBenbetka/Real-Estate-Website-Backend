@@ -1,5 +1,5 @@
 import json
-from api import db
+from src.api import db
 class Annonce(db.Model):
     __tablename__ = "annonces"
     id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True )

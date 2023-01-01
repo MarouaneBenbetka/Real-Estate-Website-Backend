@@ -1,4 +1,4 @@
-from api import db
+from src.api import db
 class Image(db.Model):
     __tablename__ = "images"
     id = db.Column(db.Integer, primary_key=True, nullable=True, unique=True)

@@ -16,7 +16,12 @@ app.config["SECRET_KEY"] = "dsqhjvfqsjnchbrehvfdsfsd"
 db = SQLAlchemy(app)
 
 from api.routes import *
-app.register_blueprint(user_bp,url_prefix="/api")
+app.register_blueprint(user_bp,url_prefix="/users")
+app.register_blueprint(annonce_bp,url_prefix="/annonces")
+app.register_blueprint(message_bp,url_prefix="/messages")
+app.register_blueprint(admin_bp,url_prefix="/admin")
+app.register_blueprint(mesAnnonces_bp,url_prefix="/mesannonces")
+
 
 
 

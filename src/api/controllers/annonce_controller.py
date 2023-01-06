@@ -5,7 +5,6 @@ from datetime import datetime
 from flask import request, make_response, jsonify
 from src.api import db
 from src.api.models import Annonce, Type
-from src.api.auth.auth import requires_auth
 
 
 def getAllAnnonces():
@@ -18,7 +17,7 @@ def getAllAnnonces():
 
     return make_response(jsonify(
         {"status": "success", "data": list(items), "message": None, "current_page": pageNumber,
-         "max_pages": annonces.total}),
+         "max_pages": math.ceil(annonces.total / 12)}),
         200)
 
 def getAnnonceDetails(annonce_id):
@@ -31,7 +30,7 @@ def AddAnnonce(user):
     body = request.get_json()
     print(body)
     if ("typeId" in body) and ("description" in body) and ("surface" in body) and ("wilaya" in body) and (
-            "price" in body) and ("category" in body) and ("commune" in body):
+            "price" in body) and ("category" in body) and ("commune" in body) and ("images" in body) and ("coordinates" in body):
         annonce = Annonce()
         annonce.price = body["price"]
         annonce.description = body["description"]

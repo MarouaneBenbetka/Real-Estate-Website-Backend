@@ -1,6 +1,5 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint
 from src.api.controllers.user_controller import getUsers
-from src.api.controllers.auth import auth_required
 
 
 user_bp = Blueprint("user_bp",__name__)

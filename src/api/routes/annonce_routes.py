@@ -1,4 +1,4 @@
-import json
+
 from flask import Blueprint
 from src.api.controllers.annonce_controller import AddAnnonce,DeleteAnnonce, getAllAnnonces, getAnnonceDetails, SearchForAnnonce
 from src.api.auth.auth import requires_auth
@@ -8,8 +8,7 @@ annonce_bp = Blueprint("annonce_bp", __name__)
 
 @annonce_bp.route('/annonces')
 @requires_auth
-def get_annonces(user):
-    print(user.toJson())
+def get_annonces():
     return getAllAnnonces()
 
 '''
@@ -40,6 +39,6 @@ def Delete_Annonce(user):
 '''
 route pour chercher une annonce
 '''
-@annonce_bp.route('/')
+@annonce_bp.route('/search')
 def Search_Annonce():
     return SearchForAnnonce()

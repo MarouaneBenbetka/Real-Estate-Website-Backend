@@ -1,13 +1,12 @@
 import json
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint
 from src.api.controllers.user_controller import getAnnoncesByUser
-from src.api.controllers.auth import auth_required
-from src.api.models.annonce import Annonce
+from src.api.auth.auth import requires_auth
 
 mesAnnonces_bp = Blueprint("mesAnnonces_bp", __name__)
 
 
 @mesAnnonces_bp.route('/')
-@auth_required
+@requires_auth
 def get_annonces(user):
     return getAnnoncesByUser(user)

@@ -1,14 +1,28 @@
+import math
+
 from flask import jsonify, request
 
 from src.api.models import Annonce,Message
 
 
 def getAllMessages(user):
-    messages = []
+    page = request.args.get("page",1,int)
+    annoncesIds = []
     for annonce in user.annonces:
-        for message in annonce.messages:
-            messages.append(message.toJson())
-    return jsonify({"status": "success", "data": messages, "message": None})
+        annoncesIds.append(annonce.id)
+    messages = Message.query.filter(Message.annonce_id.in_(annoncesIds)).paginate(per_page=25,page=page)
+    return jsonify({"current_page":page,"max_pages":math.ceil(messages.total / 12),"status": "success", "data": list(map(lambda message:message.toJson(),messages.items)), "message": None})
+
+def viewMessage(user):
+    messageId = request.get_json()["messageId"]
+    if messageId is None:
+        return jsonify({"status": "failed", "data": None, "message": "missing data"})
+    message = Message.query.filter_by(id = int(messageId)).first()
+    if message is None:
+        return jsonify({"status": "failed", "data": None, "message": "message does not exist"})
+    message.seen="0"
+    message.add()
+    return jsonify({"status":"success","data":None,"message":None})
 
 def sendMessage(user):
     body = request.get_json()

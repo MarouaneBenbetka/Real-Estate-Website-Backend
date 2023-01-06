@@ -1,9 +1,9 @@
 import uuid
-from datetime import datetime
+import datetime
 
 from flask import jsonify
 
-from src.api import app
+from src.api import  db
 from bs4 import BeautifulSoup
 import requests
 
@@ -11,6 +11,8 @@ from src.api.models import Annonce, Image, Type
 
 
 def ScrapAnnonce():
+    db.drop_all()
+    db.create_all()
     try:
         response = requests.get("http://www.annonce-algerie.com/upload/flux/rss_1.xml", verify=False)
         items = BeautifulSoup(response.content, "xml").find_all("item")
@@ -29,7 +31,13 @@ def ScrapAnnonce():
             category = data[0].split(">")[1].strip()
             type = data[0].split(">")[2].strip()
             wilaya = data[2].split(">")[1].strip()
+            wilaya = wilaya.replace("é", "e")
+            wilaya = wilaya.replace("è", "e")
+            wilaya = wilaya.replace("à", "a")
             commune = data[2].split(">")[3].strip()
+            commune=commune.replace("é", "e")
+            commune = commune.replace("è", "e")
+            commune = commune.replace("à", "a")
             address = None
             i = 0
             if len(data) == 8:
@@ -50,7 +58,8 @@ def ScrapAnnonce():
                 image.add()
         return jsonify({"status":"success","data":None,"message":None})
     except:
-        return jsonify({"status":"failed","data":None,"message":"error while scrapping"})
+        return jsonify({"status": "failed", "data": None, "message": "problem while scrapping"})
+
 
 def createAnnonceFromMap(map):
     annonce = Annonce()
@@ -63,7 +72,7 @@ def createAnnonceFromMap(map):
     annonce.description = map["description"]
     annonce.address = map["address"]
     dates = map["date"].split("/")
-    annonce.date = datetime.date(int(dates[2]), int(dates[1]), int(dates[0]))
+    annonce.date = datetime.date(int(dates[2]), int(dates[1]), int(dates[0]) )
     annonce.user_id = None
     type = Type.query.filter_by(name=map["type"]).first()
     if type == None:

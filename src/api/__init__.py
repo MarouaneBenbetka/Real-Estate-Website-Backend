@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request, jsonify, abort
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -10,7 +10,7 @@ database_path = "sqlite:///{}".format(os.path.join(project_dir, database_filenam
 
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = database_path
+app.config["SQLALCHEMY_DATABASE_URI"] =database_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "dsqhjvfqsjnchbrehvfdsfsd"
 db = SQLAlchemy(app)

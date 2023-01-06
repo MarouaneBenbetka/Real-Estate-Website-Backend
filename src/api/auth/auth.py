@@ -1,13 +1,15 @@
 import json
-from flask import abort, request, _request_ctx_stack
+
+import jwt
+from flask import abort, request, jsonify
 from functools import wraps
-from jose import jwt
 from urllib.request import urlopen
 import os
 
 from sqlalchemy import true
 
 from src.api import app
+from src.api.models import User
 
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
 ALGORITHMS = [os.environ.get("ALGORITHMS")]
@@ -28,25 +30,8 @@ extrait le token du header de la requete
 
 
 def get_token_auth_header():
-    if 'Authorization' not in request.headers:
-        raise AuthError({
-            'code': 'invalid_header',
-            'description': 'there is an error in the token'
-        }, 401)
-    auth_header = request.headers['Authorization']
-    header_parts = auth_header.split(' ')
+    pass
 
-    if len(header_parts) != 2:
-        raise AuthError({
-            'code': 'invalid_header',
-            'description': 'there is an error in the token'
-        }, 401)
-
-    if header_parts[0].lower() != 'bearer':
-        raise AuthError({'code': 'ivalid token format',
-                         'description': 'token format must be bearer TOKEN'}, 401)
-    print(header_parts[1])
-    return header_parts[1]
 
 
 '''
@@ -71,12 +56,8 @@ verifie le token issue de auth0'''
 
 
 def verify_decode_jwt(token):
-    try:
-        user = jwt.decode(token, app.config['SECRET_KEY'], algorithms='HS256')
-        return user
-    except jwt.DecodeError:
-        return 'Invalid token', 401
-            # jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    pass
+    # jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     # jwks = json.loads(jsonurl.read())
     # unverified_header = jwt.get_unverified_header(token)
     # rsa_key = {}
@@ -136,14 +117,19 @@ c'est un decorateur a utiliser dans les routes pour verifier l'auth
 '''
 
 
-def requires_auth(permission=''):
-    def requires_auth_decorator(f):
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            token = get_token_auth_header()
-            payload = verify_decode_jwt(token)
-            # check_permissions(permission, payload)
-            return f(payload, *args, **kwargs)
+def requires_auth(f):
+    @wraps(f)
+    def wrapper():
+        if 'Authorization' not in request.headers:
+            return jsonify({"success": "failed", "message": 'missing token'})
+        token = request.headers['Authorization']
+        try:
+            payload = jwt.decode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUmF5YW5lIEtlYmlyIiwiZW1haWwiOiJyYXlhbmVrZWIzMkBnbWFpbC5jb20iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUVkRlRwNmFVVlNMVmd3NXhRdllhU2oyNFBxXzVZVy1UcVVzVF9ZalVFbGY9czk2LWMiLCJzdWIiOiIxMDgyNzY2OTMxMTcwNzU0NTM1NTQiLCJpYXQiOjE2NzI3NjUyODF9.9poVbq3JtzxzhMoLjqS8W3EfygxbpYBnVuh4l9iEJwI", "28472B4B62506553", algorithms='HS256')
+            user = User.query.filter_by(email=payload["email"]).first()
+            if user==None:
+                return jsonify({"success": "failed", "message": 'Invalid user'})
+            return f(user)
+        except:
+            return jsonify({"success": "failed", "message": 'Invalid token'})
 
-        return wrapper
-    return requires_auth_decorator
+    return wrapper

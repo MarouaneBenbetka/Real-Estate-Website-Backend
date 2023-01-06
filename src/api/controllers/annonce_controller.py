@@ -1,8 +1,11 @@
+import math
 import uuid
+from datetime import datetime
 
 from flask import request, make_response, jsonify
 from src.api import db
-from src.api.models import Annonce
+from src.api.models import Annonce, Type
+from src.api.auth.auth import requires_auth
 
 
 def getAllAnnonces():
@@ -45,8 +48,38 @@ def AddAnnonce(user):
         return jsonify({"status": "failed", "data": None, "message": "missing informations"})
 
 
-def SearchForAnnonce(search_term):
-    return "this route in for searching for certain annonce"
+def SearchForAnnonce():
+    page = request.args.get("page", 1, int)
+    minDate = request.args.get("min_date", datetime.date.min)
+    maxDate = request.args.get("max_date", datetime.date.max)
+    text = request.args.get("q","")
+    wilaya = request.args.get("wilaya",None)
+    commune = request.args.get("commune",None)
+    typeName = request.args.get("type",None)
+    annonces = None
+    if typeName==None:
+        try:
+            annonces = Annonce.query.filter(
+                db.and_(Annonce.date >= minDate, Annonce.date <= maxDate, Annonce.description.like(f"%{text}%"),
+                        Annonce.wilaya.like("%%" if wilaya == None else wilaya),
+                        Annonce.wilaya.like("%%" if commune == None else commune))).paginate(
+                per_page=12, page=page)
+        except:
+            return make_response({"status": "invalid", "data": None, "message": "Invalid page Number"}, 200)
+
+    else:
+        type = Type.query.filter_by(name=typeName).first()
+        try:
+            annonces = Annonce.query.filter(
+                db.and_(Annonce.date >= minDate, Annonce.date <= maxDate, Annonce.description.like(f"%{text}%"),
+                        Annonce.wilaya.like("%%" if wilaya == None else wilaya),
+                        Annonce.wilaya.like("%%" if commune == None else commune),
+                        Annonce.type_id == type.id)).paginate(
+                per_page=12, page=page)
+        except:
+            return make_response({"status": "invalid", "data": None, "message": "Invalid page Number"}, 200)
+
+    return jsonify({"status":"success","page":page,"max_pages": math.ceil(annonces.total / 12),"message":None,"data": list(map(lambda annonce: annonce.toJson(), annonces.items))})
 
 def DeleteAnnonce(user):
     body = request.get_json()

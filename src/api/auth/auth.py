@@ -14,9 +14,11 @@ def requires_auth(f):
             payload = jwt.decode(token,
                 "28472B4B62506553", algorithms='HS256')
             print(payload)
-            user = User.query.filter(User.email==payload["email"]).first()
+            user = User.query.filter_by(id=payload["userId"]).first()
             if user is None:
                 return jsonify({"success": "failed", "message": 'Invalid user'})
+            if user.address is None or user.phone_number is None:
+                return jsonify({"status": "failed", "data": None, "message": "missing phone and address"})
             return f(user)
         except:
             return jsonify({"success": "failed", "message": 'Invalid token'})

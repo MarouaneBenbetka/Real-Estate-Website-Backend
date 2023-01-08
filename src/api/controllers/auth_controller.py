@@ -1,10 +1,9 @@
-import math
+
+import os
 import uuid
-from datetime import datetime
 import jwt
-from flask import request, make_response, jsonify
-from src.api import db
-from src.api.models import Annonce, Type, User
+from flask import request,jsonify
+from src.api.models import User
 
 
 def login():
@@ -19,11 +18,11 @@ def login():
             id = str(uuid.uuid1())
             user.id = id
             user.add()
-            token = jwt.encode({"userId":id},"28472B4B62506553")
+            token = jwt.encode({"userId":id},os.getenv("TOKEN_SECRET"))
             return jsonify({"status":"success","data":token,"message":"missing phone and address"})
         else:
             id = user.id
-            token = jwt.encode({"userId":id},"28472B4B62506553")
+            token = jwt.encode({"userId":id},os.getenv("TOKEN_SECRET"))
             if user.address is None or user.phone_number in None:
                 return jsonify({"status": "success", "data": token, "message": "missing phone and address"})
             return jsonify({"status":"success","data":token,"message":None})

@@ -2,15 +2,15 @@ import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
-
+from dotenv import load_dotenv
+load_dotenv()
 database_filename = "database.db"
 project_dir = os.path.dirname(os.path.abspath(__file__))
 database_path = "sqlite:///{}".format(os.path.join(project_dir, database_filename))
 
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] ="mysql+mysqldb://root:root@localhost/test"#database_path
+app.config["SQLALCHEMY_DATABASE_URI"] =os.getenv("DATABASE_URI")#database_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "dsqhjvfqsjnchbrehvfdsfsd"
 db = SQLAlchemy(app)

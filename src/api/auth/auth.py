@@ -1,3 +1,4 @@
+import os
 
 import jwt
 from flask import abort, request, jsonify
@@ -12,7 +13,7 @@ def requires_auth(f):
         token = request.headers['Authorization']
         try:
             payload = jwt.decode(token,
-                "28472B4B62506553", algorithms='HS256')
+                os.getenv("TOKEN_SECRET"), algorithms='HS256')
             print(payload)
             user = User.query.filter_by(id=payload["userId"]).first()
             if user is None:

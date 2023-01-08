@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from flask_cors import CORS
 load_dotenv()
 database_filename = "database.db"
 project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,6 +15,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] =os.getenv("DATABASE_URI")#database_path
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "dsqhjvfqsjnchbrehvfdsfsd"
 db = SQLAlchemy(app)
+CORS(app)
 
 from src.api.routes import *
 app.register_blueprint(user_bp,url_prefix="/users")

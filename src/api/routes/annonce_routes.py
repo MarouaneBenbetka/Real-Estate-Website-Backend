@@ -7,7 +7,6 @@ from src.api.auth.auth import requires_auth
 annonce_bp = Blueprint("annonce_bp", __name__)
 
 @annonce_bp.route('/annonces')
-@requires_auth
 def get_annonces():
     return getAllAnnonces()
 

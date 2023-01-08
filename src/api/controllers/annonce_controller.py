@@ -60,8 +60,8 @@ def SearchForAnnonce():
         try:
             annonces = Annonce.query.filter(
                 db.and_(Annonce.date >= minDate, Annonce.date <= maxDate, Annonce.description.like(f"%{text}%"),
-                        Annonce.wilaya.like("%%" if wilaya == None else wilaya),
-                        Annonce.wilaya.like("%%" if commune == None else commune))).paginate(
+                        Annonce.wilaya.like("%%" if wilaya is None else wilaya),
+                        Annonce.wilaya.like("%%" if commune is None else commune))).paginate(
                 per_page=12, page=page)
         except:
             return make_response({"status": "invalid", "data": None, "message": "Invalid page Number"}, 200)
@@ -71,8 +71,8 @@ def SearchForAnnonce():
         try:
             annonces = Annonce.query.filter(
                 db.and_(Annonce.date >= minDate, Annonce.date <= maxDate, Annonce.description.like(f"%{text}%"),
-                        Annonce.wilaya.like("%%" if wilaya == None else wilaya),
-                        Annonce.wilaya.like("%%" if commune == None else commune),
+                        Annonce.wilaya.like("%%" if wilaya is None else wilaya),
+                        Annonce.wilaya.like("%%" if commune is None else commune),
                         Annonce.type_id == type.id)).paginate(
                 per_page=12, page=page)
         except:

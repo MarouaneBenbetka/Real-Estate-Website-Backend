@@ -6,7 +6,7 @@ from src.api.auth.auth import requires_auth
 
 annonce_bp = Blueprint("annonce_bp", __name__)
 
-@annonce_bp.route('/annonces')
+@annonce_bp.route('/',methods=["GET"])
 def get_annonces():
     return getAllAnnonces()
 

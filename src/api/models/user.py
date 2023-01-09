@@ -4,7 +4,7 @@ class User(db.Model):
     id = db.Column(db.String(36), primary_key=True, nullable=False, unique=True)
     full_name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    phone_number = db.Column(db.String(10), nullable=False)
+    phone_number = db.Column(db.String(10))
     address = db.Column(db.String(50))
     picture_link = db.Column(db.String(255))
     annonces = db.relationship("Annonce", backref="owner", lazy=False)

@@ -1,7 +1,7 @@
 import uuid
 import datetime
 
-from flask import jsonify
+from flask import jsonify, make_response
 
 from src.api import  db
 from bs4 import BeautifulSoup
@@ -11,8 +11,7 @@ from src.api.models import Annonce, Image, Type
 
 
 def ScrapAnnonce():
-    db.drop_all()
-    db.create_all()
+
     try:
         response = requests.get("http://www.annonce-algerie.com/upload/flux/rss_1.xml", verify=False)
         items = BeautifulSoup(response.content, "xml").find_all("item")
@@ -29,6 +28,8 @@ def ScrapAnnonce():
                 if len(tr.find_all('td', class_=("da_field_text"))) != 0:
                     data.append(tr.find_all('td', class_=("da_field_text"))[0].get_text())
             category = data[0].split(">")[1].strip()
+            if category not in ["Vente", "Echange", "Location", "Location vacances"]:
+                continue
             type = data[0].split(">")[2].strip()
             wilaya = data[2].split(">")[1].strip()
             wilaya = wilaya.replace("é", "e")
@@ -56,9 +57,9 @@ def ScrapAnnonce():
                 image.annonce_id = annonce.id
                 image.link = "http://www.annonce-algerie.com" + imageInfo.get("src")
                 image.add()
-        return jsonify({"status":"success","data":None,"message":None})
+        return make_response(jsonify({"status":"success","data":None,"message":None}),200)
     except:
-        return jsonify({"status": "failed", "data": None, "message": "problem while scrapping"})
+        return make_response(jsonify({"status": "failed", "data": None, "message": "problem while scrapping"}),501)
 
 
 def createAnnonceFromMap(map):

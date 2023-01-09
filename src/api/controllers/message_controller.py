@@ -1,6 +1,6 @@
 import math
 
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 
 from src.api.models import Annonce,Message
 
@@ -10,19 +10,23 @@ def getAllMessages(user):
     annoncesIds = []
     for annonce in user.annonces:
         annoncesIds.append(annonce.id)
-    messages = Message.query.filter(Message.annonce_id.in_(annoncesIds)).paginate(per_page=25,page=page)
-    return jsonify({"current_page":page,"max_pages":math.ceil(messages.total / 12),"status": "success", "data": list(map(lambda message:message.toJson(),messages.items)), "message": None})
+    try:
+        messages = Message.query.filter(Message.annonce_id.in_(annoncesIds)).paginate(per_page=25,page=page)
+        return make_response(jsonify({"current_page":page,"max_pages":math.ceil(messages.total / 12),"status": "success", "data": list(map(lambda message:message.toJson(),messages.items)), "message": None}),200)
+    except:
+        return make_response({"status": "failed", "data": None, "message": "Invalid page Number"}, 404)
+
 
 def viewMessage(user):
     messageId = request.get_json()["messageId"]
     if messageId is None:
-        return jsonify({"status": "failed", "data": None, "message": "missing data"})
+        return make_response(jsonify({"status": "failed", "data": None, "message": "missing data"}),400)
     message = Message.query.filter_by(id = int(messageId)).first()
     if message is None:
-        return jsonify({"status": "failed", "data": None, "message": "message does not exist"})
+        return make_response(jsonify({"status": "failed", "data": None, "message": "message does not exist"}),400)
     message.seen="0"
     message.add()
-    return jsonify({"status":"success","data":None,"message":None})
+    return make_response(jsonify({"status":"success","data":None,"message":None}),200)
 
 def sendMessage(user):
     body = request.get_json()
@@ -37,9 +41,9 @@ def sendMessage(user):
         message.annonce_id = body["annonceId"]
         message.sender_id = user.id
         message.add()
-        return jsonify({"status": "success", "data": None, "message": "message sent successfully"})
+        return make_response(jsonify({"status": "success", "data": None, "message": "message sent successfully"}),200)
 
     else:
-        return jsonify({"status": "failed", "data": None, "message": "invalid request"})
+        return make_response(jsonify({"status": "failed", "data": None, "message": "invalid request"}),400)
 
 

@@ -5,7 +5,7 @@ from src.api.models import User
 
 
 def getUsers():
-    return jsonify( {"status":"success","data":list(map(lambda user:user.toJson(),User.query.all())),"message":None})
+    return make_response(jsonify( {"status":"success","data":list(map(lambda user:user.toJson(),User.query.all())),"message":None}),200)
 
 
 def getAnnoncesByUser(user):

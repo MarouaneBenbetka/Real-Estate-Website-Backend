@@ -14,6 +14,7 @@ class Annonce(db.Model):
     wilaya = db.Column(db.String(30))
     commune = db.Column(db.String(30))
     address = db.Column(db.String(255))
+    date = db.Column(db.Date)
     user_id = db.Column(db.String(36), db.ForeignKey("users.id"))
     type_id = db.Column(db.Integer, db.ForeignKey("types.id"))
     images = db.relationship("Image", backref="annonce", lazy=False)

@@ -12,7 +12,7 @@ URL = "https://www.beytic.com/annonces-immobilieres/"
 
 def getAnnouncesLinks(pageURL):
     """@param pageURL: -all announces- page url
-       @return: an array of links that take the -announce details- page
+       @return: an array of links that take to the -announce details- page
     """
     html_text = requests.get(pageURL).text
     soup= BeautifulSoup(html_text,"lxml")
@@ -25,11 +25,17 @@ def getAnnouncesLinks(pageURL):
 
 
 def getPageLink(url,page_number):
-    
+    """ @param url: -all announces- page url
+        @param page_number : the number of the wanted page starting from 1
+        @return: the url of the wanted page
+    """
     return f"{url}?_page={page_number}"
 
 
 def scrap_page(page_url):
+    """ @param page_url: url of -all announces- page it contains (cards)
+        @return: an array of json objects each object contain the announce details 
+    """
     res=[]
     for announce_page_url in getAnnouncesLinks(page_url):
         try:
@@ -100,6 +106,9 @@ def scrap_page(page_url):
 
 
 def scrap_beytic_website(nb_pages_to_scrap):
+    """ @param nb_pages_to_scrap: number of pages to scrap
+    """
+    print("hi")
     if nb_pages_to_scrap <= 0 or nb_pages_to_scrap>30 :return
     res=[]
     for page_count in range(1,nb_pages_to_scrap+1):
@@ -118,5 +127,5 @@ def scrap_beytic_website(nb_pages_to_scrap):
 
 
 
-scrap_beytic_website(1)
+scrap_beytic_website(16)
 

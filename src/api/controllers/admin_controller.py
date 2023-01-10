@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import requests
 
 from src.api.models import Annonce, Image, Type
+from beytic_scrap import scrap_beytic_website #use this function to scrap from the beytic_website
 
 
 def ScrapAnnonce():

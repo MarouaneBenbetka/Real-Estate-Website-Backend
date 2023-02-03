@@ -16,8 +16,10 @@ class Annonce(db.Model):
     address = db.Column(db.String(255))
     date = db.Column(db.Date)
     user_id = db.Column(db.String(36), db.ForeignKey("users.id"))
+    contact_info_id = db.Column(db.Integer,db.ForeignKey("contactInfos.id"))
     type_id = db.Column(db.Integer, db.ForeignKey("types.id"))
     images = db.relationship("Image", backref="annonce", lazy=False)
+    messages = db.relationship("Message", backref="annonce", lazy=False)
     latitude = db.Column(db.String(30))
     longitude = db.Column(db.String(30))
     def briefObjToJson(self):
@@ -29,9 +31,13 @@ class Annonce(db.Model):
     def toJson(self):
         return {"id" : self.id,"typeAnnonce":self.category,"surface":self.surface,"description":self.description,"prix":self.price
                        ,"wilaya":self.wilaya,"commune":self.commune,"address":self.address,"typeImmoblier":Type.query.filter_by(id=self.type_id).first().name,"coordinates":{"latitude":self.latitude,"longitude":self.longitude},
-                "images":list(map(lambda image:image.link,self.images)),"contactInfo":User.query.filter_by(id=self.user_id).first().contactInfo() if self.user_id!=None else None
+                "images":list(map(lambda image:image.link,self.images)),"date":self.date,"contactInfo":self.contactInfo.toJson(),"userId":self.user_id
         }
     def add(self):
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
         db.session.commit()
 

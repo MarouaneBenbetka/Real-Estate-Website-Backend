@@ -30,7 +30,7 @@ def AddAnnonce(user):
     body = request.get_json()
     print(body)
     if ("typeId" in body) and ("description" in body) and ("surface" in body) and ("wilaya" in body) and (
-            "price" in body) and ("category" in body) and ("commune" in body) and ("images" in body) and ("coordinates" in body) and ("images" in body):
+            "price" in body) and ("category" in body) and ("commune" in body) and ("images" in body) and ("coordinates" in body):
         annonce = Annonce()
         annonce.price = body["price"]
         annonce.description = body["description"]
@@ -39,6 +39,10 @@ def AddAnnonce(user):
         annonce.type_id = int(body["typeId"])
         annonce.surface = body["surface"]
         annonce.category = body["category"]
+        annonce.latitude = body["coordinates"]["lat"]
+        annonce.longitude = body["coordinates"]["lng"]
+        annonce.date = datetime.datetime.now()
+        annonce.contact_info_id = user.contact_info_id
         annonce.id = str(uuid.uuid1())
         annonce.user_id = user.id
         annonce.add()
@@ -48,7 +52,7 @@ def AddAnnonce(user):
             image.link = image_link
             image.add()
 
-        return make_response(jsonify({"status": "done", "data": None, "message": None}),200)
+        return make_response(jsonify({"status": "done", "data": annonce.toJson(), "message": None}),200)
     else:
         return make_response(jsonify({"status": "failed", "data": None, "message": "missing informations"}),400)
 
@@ -80,13 +84,16 @@ def SearchForAnnonce():
         return make_response({"status": "invalid", "data": None, "message": "Invalid page Number"}, 404)
 
 
-def DeleteAnnonce(user):
-    body = request.get_json()
-    if "annonceId" in body:
-        annonce = Annonce.query.filter(db.and_(Annonce.id == body["annonceId"], Annonce.user_id == user.id)).first()
+def DeleteAnnonce(user,annonceId):
+    if annonceId is not None:
+        annonce = Annonce.query.filter(db.and_(Annonce.id == annonceId, Annonce.user_id == user.id)).first()
         if annonce == None:
-            return make_response(jsonify({"status": "failed", "data": None, "message": "invalid request"}),400)
+            return make_response(jsonify({"status": "failed", "data": None, "message": "invalid annonce"}),404)
+        for message in annonce.messages:
+            message.delete()
         annonce.delete()
         return jsonify({"status": "done", "data": None, "message": None})
     else:
         return make_response(jsonify({"status": "failed", "data": None, "message": "invalid request"}),400)
+def getTypes():
+    return make_response(jsonify({"status":"success","data":list(map(lambda type:type.toJSON(),Type.query.all()))}),200)

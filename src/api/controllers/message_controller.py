@@ -3,6 +3,8 @@ import math
 from flask import jsonify, request, make_response
 
 from src.api.models import Annonce,Message
+from src.api import db
+
 
 
 def getAllMessages(user):
@@ -45,5 +47,12 @@ def sendMessage(user):
 
     else:
         return make_response(jsonify({"status": "failed", "data": None, "message": "invalid request"}),400)
+def unSeenMessagesCount(user):
+    annoncesIds = []
+    for annonce in user.annonces:
+        annoncesIds.append(annonce.id)
+    messages = Message.query.filter(db.and_(Message.annonce_id.in_(annoncesIds),Message.seen=='0')).all()
+    return make_response(jsonify(
+        { "status": "success", "data": len(messages), "message": None}), 200)
 
 
